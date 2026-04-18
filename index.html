@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sternmeister Dialog Research</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="sidebar-logo">
+        <h1>Sternmeister</h1>
+        <p>Dialog Research System</p>
+      </div>
+      <div class="nav-item active" data-page="overview">
+        <span class="nav-icon">📊</span> Обзор
+      </div>
+      <div class="nav-item" data-page="correlations">
+        <span class="nav-icon">🔗</span> Корреляции
+      </div>
+      <div class="nav-item" data-page="calls">
+        <span class="nav-icon">📞</span> Анализ звонков
+      </div>
+      <div class="nav-item" data-page="objections">
+        <span class="nav-icon">🛡</span> Возражения
+      </div>
+      <div class="nav-item" data-page="recommendations">
+        <span class="nav-icon">💡</span> Рекомендации
+      </div>
+      <div class="nav-item" data-page="report">
+        <span class="nav-icon">📋</span> Отчёт
+      </div>
+      <div style="border-top:1px solid var(--border);margin:12px 0"></div>
+      <div class="nav-item" data-page="script-audit">
+        <span class="nav-icon">🔍</span> Аудит скрипта
+      </div>
+      <div class="nav-item" data-page="new-script">
+        <span class="nav-icon">📝</span> Новый скрипт
+      </div>
+    </nav>
+
+    <main class="main">
+
+      <!-- ОБЗОР -->
+      <div id="page-overview" class="page active">
+        <div class="page-header">
+          <h2>Обзор анализа</h2>
+          <p>Мультиагентный анализ диалогов менеджеров Sternmeister</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--accent-light)" id="stat-total-calls">—</div>
+            <div class="stat-label">Звонков проанализировано</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--danger-light)" id="stat-top-category">—</div>
+            <div class="stat-label" id="stat-top-category-label">Главная причина задержки</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--success-light)" id="stat-crm-matched">—</div>
+            <div class="stat-label">Сопоставлено с CRM</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--warning)" id="stat-objection-themes">—</div>
+            <div class="stat-label">Тем возражений</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Executive Summary</div>
+          <p id="overview-text" style="font-size:14px;line-height:1.8;color:var(--text-muted)"></p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Категории задержек</div>
+            <div class="chart-container" style="height:280px">
+              <canvas id="categoryPieChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Темы возражений</div>
+            <div class="chart-container" style="height:280px">
+              <canvas id="objectionBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Хронология звонков</div>
+          <div class="chart-container" style="height:200px">
+            <canvas id="timelineChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- КОРРЕЛЯЦИИ -->
+      <div id="page-correlations" class="page">
+        <div class="page-header">
+          <h2>Матрица корреляций</h2>
+          <p>Связь ошибок менеджеров с негативными CRM-статусами</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Паттерны ошибок → CRM-статус</div>
+          <div id="correlation-matrix"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Категория → Причина (детализация)</div>
+          <div id="category-details"></div>
+        </div>
+      </div>
+
+      <!-- АНАЛИЗ ЗВОНКОВ -->
+      <div id="page-calls" class="page">
+        <div class="page-header">
+          <h2>Анализ звонков</h2>
+          <p>Детальный разбор каждого звонка</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Длительность звонков по категориям</div>
+          <div class="chart-container" style="height:250px">
+            <canvas id="durationBarChart"></canvas>
+          </div>
+        </div>
+
+        <div id="calls-filter" class="filter-bar"></div>
+        <div id="calls-list"></div>
+      </div>
+
+      <!-- ВОЗРАЖЕНИЯ -->
+      <div id="page-objections" class="page">
+        <div class="page-header">
+          <h2>Анализ возражений</h2>
+          <p>Тематический разбор возражений клиентов</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Распределение тем возражений</div>
+          <div class="chart-container" style="height:300px">
+            <canvas id="objectionPolarChart"></canvas>
+          </div>
+        </div>
+
+        <div id="objection-themes-list"></div>
+      </div>
+
+      <!-- РЕКОМЕНДАЦИИ -->
+      <div id="page-recommendations" class="page">
+        <div class="page-header">
+          <h2>Рекомендации</h2>
+          <p>Data-driven корректировки скрипта продаж</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Рекомендации по CRM</div>
+          <div id="crm-recommendations"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Топ рекомендаций по звонкам</div>
+          <div id="top-recommendations"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">План действий (4 недели)</div>
+          <div id="action-plan"></div>
+        </div>
+      </div>
+
+      <!-- ОТЧЁТ -->
+      <div id="page-report" class="page">
+        <div class="page-header">
+          <h2>Executive Report</h2>
+          <p>Полный отчёт по анализу диалогов</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Сводка</div>
+          <p id="report-overview" style="font-size:14px;line-height:1.8;color:var(--text-muted)"></p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Разбивка по категориям</div>
+          <div id="category-breakdown"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Все звонки (детализация)</div>
+          <div id="all-calls-table"></div>
+        </div>
+      </div>
+
+      <!-- АУДИТ СКРИПТА -->
+      <div id="page-script-audit" class="page">
+        <div class="page-header">
+          <h2>Аудит скрипта продаж</h2>
+          <p>Сравнение текущего скрипта с реальной проблематикой звонков</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Executive Summary</div>
+          <p id="audit-summary" style="font-size:14px;line-height:1.8;color:var(--text-muted)"></p>
+        </div>
+        <div class="stats-grid" id="audit-metrics"></div>
+        <div id="audit-gaps"></div>
+        <div class="card">
+          <div class="card-title" style="color:var(--success-light)">Сильные стороны текущего скрипта</div>
+          <div id="audit-strengths"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Приоритетный план действий</div>
+          <div id="audit-actions"></div>
+        </div>
+      </div>
+
+      <!-- НОВЫЙ СКРИПТ -->
+      <div id="page-new-script" class="page">
+        <div class="page-header">
+          <h2>Улучшенный скрипт v2.0</h2>
+          <p id="new-script-subtitle"></p>
+        </div>
+        <div class="card">
+          <div class="card-title">Сравнение v1 → v2</div>
+          <div id="script-comparison"></div>
+        </div>
+        <div id="script-sections"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script src="data/script-analysis.js"></script>
+  <script src="data/improved-script.js"></script>
+  <script src="data/crm-statuses.js"></script>
+  <script src="data/leads.js"></script>
+  <script src="data/analysis-results.js"></script>
+  <script src="data/correlations.js"></script>
+  <script src="data/report.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
