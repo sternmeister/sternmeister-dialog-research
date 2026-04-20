@@ -1,9 +1,9 @@
 const IMPROVED_SCRIPT = {
-  title: "Скрипт продаж Sternmeister v3.0 — Master Edition",
-  version: "3.0",
-  date: "18.04.2026",
-  basedOn: "Анализ 30 звонков + 7 методологий: SPIN, Sandler, Chris Voss, Challenger, Gap Selling, Straight Line, CARE Framework",
-  changeLog: "v3.0: Добавлены Pre-Call подготовка, Pattern Interrupt, Up-Front Contract (Sandler), Зеркало + Ярлык (Chris Voss), SPIN-вопросы, Gap Selling Math, Challenger Teach Moment, Тональность (Straight Line), Three Tens, Negative Reverse, Voicemail, WhatsApp-шаблоны, Follow-up Call, Follow-up Cadence, Loss Aversion. v2.1: Блоки «График», «§24 FAQ», Trial Close. v2.0: Навигатор Jobcenter, micro-commitments, кейсы, «Язык не барьер», urgency",
+  title: "Скрипт продаж Sternmeister v3.1 — 20-минутная консультация максимального воздействия",
+  version: "3.1",
+  date: "17.04.2026",
+  basedOn: "Анализ 30 звонков + 7 методологий. Оптимизирован для 20-25 мин с хронометражем по фазам.",
+  changeLog: "v3.1: Полная реструктуризация под 20-25 мин. 5 фаз с таймингом (Захват → Квалификация → Переворот → Мост → Закрытие). Слияние блоков для плотности. 5 железных правил. Тональность по фазам. Истории и возражения вынесены в справочники. v3.0: Pre-Call, Pattern Interrupt, Up-Front Contract, SPIN, Gap Selling Math, Challenger Teach, Three Tens, Loss Aversion, Voicemail, WhatsApp, Follow-up. v2.1: График, §24, Trial Close. v2.0: Навигатор Jobcenter, micro-commitments, кейсы, urgency",
 
   sections: [
     {
@@ -452,19 +452,21 @@ WhatsApp после пропущенного:
       whatsapp: "нет"
     },
     newScript: {
-      sections: 22,
-      jobcenterLines: "5 сценариев + Calibrated Questions",
-      jobcenterPct: 25,
-      objections: "25+ с единой формулой",
-      closingLevels: "3 + Three Tens",
-      stories: "5 в формате STAR",
-      urgencyPoints: "3 + Loss Aversion Math",
+      sections: "5 фаз + справочники",
+      jobcenterLines: "5 сценариев (1 на звонок)",
+      jobcenterPct: 20,
+      objections: "15 в справочнике + универсальная формула",
+      closingLevels: "3 + Three Tens + FOMO #3",
+      stories: "6 (выбираем 1 под клиента, 30 сек STAR)",
+      urgencyPoints: "3 распределённых + Loss Aversion €14 400",
       methodologies: "7 (SPIN, Sandler, Voss, Challenger, Gap, Straight Line, CARE)",
       preCallPrep: "CRM-чеклист + настрой",
-      tonality: "4 режима по этапам",
-      followUp: "6 касаний за 3 недели + 2-й/3-й звонок",
+      tonality: "5 режимов по фазам",
+      followUp: "6 касаний за 3 недели",
       voicemail: "скрипт + WhatsApp",
-      whatsapp: "4 шаблона"
+      whatsapp: "5 шаблонов",
+      timing: "20-25 мин, 5 фаз по 2-5 мин",
+      maxMonologue: "60 сек"
     }
   }
 };
