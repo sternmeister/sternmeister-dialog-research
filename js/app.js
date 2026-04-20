@@ -463,19 +463,26 @@ function renderNewScript() {
   if (compEl) {
     const o = script.comparisonSummary.oldScript;
     const n = script.comparisonSummary.newScript;
+    const compareRows = [
+      ['Секций', o.sections, n.sections],
+      ['Jobcenter-навигация', `${o.jobcenterLines} строки (${o.jobcenterPct}%)`, `${n.jobcenterLines} (~${n.jobcenterPct}%)`],
+      ['Закрытие', o.closingLevels, n.closingLevels],
+      ['Истории успеха', o.stories, n.stories],
+      ['Urgency', `${o.urgencyPoints} (в конце)`, n.urgencyPoints],
+      ['Возражений', o.objections, n.objections],
+      ['Методологии продаж', o.methodologies || 0, n.methodologies || '—'],
+      ['Pre-Call подготовка', o.preCallPrep || 'нет', n.preCallPrep || '—'],
+      ['Тональность', o.tonality || 'нет', n.tonality || '—'],
+      ['Follow-up', o.followUp || 'нет', n.followUp || '—'],
+      ['Voicemail', o.voicemail || 'нет', n.voicemail || '—'],
+      ['WhatsApp-шаблоны', o.whatsapp || 'нет', n.whatsapp || '—'],
+    ];
     compEl.innerHTML = `
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>Параметр</th><th>Старый скрипт</th><th>Новый скрипт</th></tr></thead>
+          <thead><tr><th>Параметр</th><th>Старый скрипт</th><th>Новый скрипт v3.0</th></tr></thead>
           <tbody>
-            <tr><td>Jobcenter-навигация</td><td>${o.jobcenterLines} строки (${o.jobcenterPct}%)</td><td><strong style="color:var(--success-light)">${n.jobcenterLines} (~${n.jobcenterPct}%)</strong></td></tr>
-            <tr><td>Уровней закрытия</td><td>${o.closingLevels}</td><td><strong style="color:var(--success-light)">${n.closingLevels}</strong></td></tr>
-            <tr><td>Истории успеха</td><td>${o.stories}</td><td><strong style="color:var(--success-light)">${n.stories} (сегментированных)</strong></td></tr>
-            <tr><td>Точек urgency</td><td>${o.urgencyPoints} (в конце)</td><td><strong style="color:var(--success-light)">${n.urgencyPoints} (распределены)</strong></td></tr>
-            <tr><td>Возражений</td><td>${o.objections}</td><td><strong style="color:var(--success-light)">${n.objections}</strong></td></tr>
-            ${n.scheduleBlock ? `<tr><td>Блок «График»</td><td>${o.scheduleBlock || '1 строка'}</td><td><strong style="color:var(--success-light)">${n.scheduleBlock}</strong></td></tr>` : ''}
-            ${n.paragraph24 ? `<tr><td>FAQ §24</td><td>${o.paragraph24 || 'нет'}</td><td><strong style="color:var(--success-light)">${n.paragraph24}</strong></td></tr>` : ''}
-            ${n.trialClose ? `<tr><td>Trial Close</td><td>${o.trialClose || 'нет'}</td><td><strong style="color:var(--success-light)">${n.trialClose}</strong></td></tr>` : ''}
+            ${compareRows.map(([label, old, nw]) => `<tr><td>${label}</td><td>${old}</td><td><strong style="color:var(--success-light)">${nw}</strong></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
