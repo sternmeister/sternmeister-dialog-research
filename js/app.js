@@ -476,11 +476,13 @@ function renderNewScript() {
       ['Follow-up', o.followUp || 'нет', n.followUp || '—'],
       ['Voicemail', o.voicemail || 'нет', n.voicemail || '—'],
       ['WhatsApp-шаблоны', o.whatsapp || 'нет', n.whatsapp || '—'],
+      ['Хронометраж', o.timing || 'нет', n.timing || '—'],
+      ['Макс. монолог', o.maxMonologue || 'нет ограничений', n.maxMonologue || '—'],
     ];
     compEl.innerHTML = `
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>Параметр</th><th>Старый скрипт</th><th>Новый скрипт v3.0</th></tr></thead>
+          <thead><tr><th>Параметр</th><th>Старый скрипт</th><th>Новый скрипт v3.1</th></tr></thead>
           <tbody>
             ${compareRows.map(([label, old, nw]) => `<tr><td>${label}</td><td>${old}</td><td><strong style="color:var(--success-light)">${nw}</strong></td></tr>`).join('')}
           </tbody>
