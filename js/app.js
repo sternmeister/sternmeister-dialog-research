@@ -482,7 +482,7 @@ function renderNewScript() {
     compEl.innerHTML = `
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>Параметр</th><th>Старый скрипт</th><th>Новый скрипт v3.1</th></tr></thead>
+          <thead><tr><th>Параметр</th><th>Старый скрипт (v2.1)</th><th>Новый скрипт v4.0</th></tr></thead>
           <tbody>
             ${compareRows.map(([label, old, nw]) => `<tr><td>${label}</td><td>${old}</td><td><strong style="color:var(--success-light)">${nw}</strong></td></tr>`).join('')}
           </tbody>
