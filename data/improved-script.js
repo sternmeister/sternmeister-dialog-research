@@ -2,7 +2,7 @@ const IMPROVED_SCRIPT = {
   title: "Скрипт продаж Sternmeister v4.0 — ULTIMATE EDITION",
   version: "4.0",
   date: "21.04.2026",
-  basedOn: "Анализ 30 звонков + 7 методологий + 157 тактик из Sales Advice Pack (SPIN, Sandler, Chris Voss, Challenger, Gap Selling, Straight Line, CARE Framework)",
+  basedOn: "Анализ 52 звонков + 7 методологий + 157 тактик из Sales Advice Pack (SPIN, Sandler, Chris Voss, Challenger, Gap Selling, Straight Line, CARE Framework)",
   changeLog: "v4.0: Интеграция 157 тактик из Sales Advice Pack. Новые блоки: Тональность и голос, Назначение встреч / No-Show, FAQ Bildungsgutschein. Добавлены: «потому что»-reasoning, No-oriented opener, правило 4 секунд, серия 4 микро-да, калиброванные вопросы How/What, «Помогите мне понять», готовые фразы на немецком для Termin, «мы идём вместе», Future Pacing, эмоциональный якорь (дети), «Именно так!», шкала 1-10, лучший/худший сценарий, Takeaway Close, петля (Looping), «Что заставляет вас так говорить?», «Если я смогу... вы готовы?», каденция 7 касаний, WhatsApp как основной канал. v3.1: 5 фаз с таймингом. v3.0: Pattern Interrupt, SPIN, Gap Selling Math, Challenger Teach, Three Tens, Loss Aversion. v2.1: График, §24, Trial Close. v2.0: Навигатор Jobcenter, micro-commitments.",
 
   sections: [

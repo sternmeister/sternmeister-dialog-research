@@ -109,6 +109,7 @@ function renderOverview() {
 
 function renderCorrelations() {
   const report = typeof REPORT_DATA !== 'undefined' ? REPORT_DATA : {};
+  const totalCalls = typeof CORRELATIONS_DATA !== 'undefined' ? CORRELATIONS_DATA.local.totalAnalyzed : 0;
 
   const matrixContainer = document.getElementById('correlation-matrix');
   if (matrixContainer && report.correlationMatrix) {
@@ -123,7 +124,7 @@ function renderCorrelations() {
               <tr>
                 <td>${row.mistake}</td>
                 <td>${row.statuses.map(s => `<span class="badge badge-danger" style="margin:2px">${s}</span>`).join(' ')}</td>
-                <td><strong>${row.frequency}</strong> (${row.evidence} из 16)</td>
+                <td><strong>${row.frequency}</strong> (${row.evidence} из ${totalCalls})</td>
                 <td><span class="badge ${row.severity === 'high' ? 'badge-danger' : row.severity === 'medium' ? 'badge-warning' : 'badge-success'}">${row.severity}</span></td>
               </tr>
             `).join('')}
