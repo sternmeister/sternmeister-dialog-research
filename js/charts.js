@@ -6,7 +6,7 @@ function initCharts() {
   renderObjectionPolar();
 }
 
-const chartColors = ['#6c5ce7', '#e74c3c', '#fdcb6e', '#74b9ff', '#a29bfe', '#00b894', '#ff6b6b'];
+const chartColors = ['#6c5ce7', '#e74c3c', '#fdcb6e', '#74b9ff', '#a29bfe', '#00b894', '#ff6b6b', '#0984e3', '#d63031', '#e17055', '#fd79a8', '#636e72', '#fab1a0'];
 const chartTextColor = '#8b8fa3';
 const chartGridColor = '#2a2e3d';
 
@@ -22,6 +22,14 @@ function renderCategoryPie() {
       'нет_срочности': 'Нет срочности',
       'конкуренты': 'Конкуренты',
       'другое': 'Другое',
+      'график': 'График',
+      'семья_здоровье': 'Семья / Здоровье',
+      'jobcenter_документы': 'Jobcenter (док.)',
+      'jobcenter_бератор': 'Jobcenter (бератор)',
+      'цена': 'Цена',
+      'язык': 'Уровень языка',
+      'недоверие': 'Недоверие',
+      'jobcenter_термин': 'Jobcenter (термин)',
     };
     return map[k] || k;
   });
@@ -58,6 +66,10 @@ function renderObjectionBar() {
     'текущая_работа': 'Работа',
     'семья': 'Семья',
     'другое': 'Другое',
+    'график': 'График',
+    'стоимость': 'Стоимость',
+    'недоверие': 'Недоверие',
+    'неактуально': 'Неактуально',
   };
   const labels = sorted.map(([k]) => themeLabels[k] || k);
   const values = sorted.map(([, v]) => v.count);
@@ -142,6 +154,14 @@ function renderDurationBar() {
     'нет_срочности': '#fdcb6e',
     'конкуренты': '#74b9ff',
     'другое': '#a29bfe',
+    'график': '#e17055',
+    'семья_здоровье': '#fd79a8',
+    'jobcenter_документы': '#6c5ce7',
+    'jobcenter_бератор': '#a29bfe',
+    'цена': '#00b894',
+    'язык': '#0984e3',
+    'недоверие': '#d63031',
+    'jobcenter_термин': '#6c5ce7',
   };
   const labels = entries.map(r => r.leadName?.split(' ')[0] || `Lead ${r.leadId}`);
   const durations = entries.map(r => r.durationMin);
