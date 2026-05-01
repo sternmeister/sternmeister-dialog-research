@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderObjections();
   renderRecommendations();
   renderReport();
+  renderExpanded();
   renderScriptAudit();
   renderNewScript();
   initCharts();
@@ -512,6 +513,217 @@ function renderNewScript() {
       </div>
     `).join('');
   }
+}
+
+function renderExpanded() {
+  const data = typeof EXPANDED_ANALYSIS !== 'undefined' ? EXPANDED_ANALYSIS : null;
+  if (!data) return;
+
+  const meta = document.getElementById('expanded-meta');
+  if (meta) meta.textContent = `${data.title} • ${data.source} • ${data.date}`;
+
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setText('exp-stat-sample', data.sampleSize);
+  setText('exp-stat-corpus', `${data.totalCorpus}+`);
+  setText('exp-stat-compliance', `${data.scriptComplianceV5.overall}%`);
+  setText('exp-stat-new', data.newPatterns.length);
+  setText('exp-overview', data.overview);
+
+  const reasonsList = document.getElementById('exp-reasons-list');
+  if (reasonsList) {
+    reasonsList.innerHTML = data.topReasons.map(r => `
+      <div class="card-inset" style="border-left:4px solid ${severityColor(r.severity)};margin-bottom:12px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <strong style="font-size:14px">${formatCategoryName(r.category)}</strong>
+          <span class="badge ${severityBadge(r.severity)}">${r.count} (${r.pct}%) — ${r.severity}</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);margin:6px 0">${r.description}</p>
+        <details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--accent-light)">Цитаты клиентов (${r.examples.length})</summary>
+          <ul style="margin:8px 0 0 16px;font-size:12px;color:var(--text-muted)">
+            ${r.examples.map(e => `<li style="margin:4px 0"><em>${e}</em></li>`).join('')}
+          </ul>
+        </details>
+      </div>
+    `).join('');
+  }
+
+  const mistakesList = document.getElementById('exp-mistakes-list');
+  if (mistakesList) {
+    mistakesList.innerHTML = data.topManagerMistakes.map(m => `
+      <div class="card-inset" style="border-left:4px solid ${severityColor(m.severity)};margin-bottom:12px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <strong style="font-size:14px">${m.mistake}</strong>
+          <span class="badge ${severityBadge(m.severity)}">${m.count} (${m.pct}%)</span>
+        </div>
+        <details style="margin-top:6px"><summary style="cursor:pointer;font-size:12px;color:var(--accent-light)">Примеры (${m.examples.length})</summary>
+          <ul style="margin:8px 0 0 16px;font-size:12px;color:var(--text-muted)">
+            ${m.examples.map(e => `<li style="margin:4px 0">${e}</li>`).join('')}
+          </ul>
+        </details>
+        <div style="margin-top:8px;padding:8px;background:rgba(110,193,228,0.08);border-radius:6px;font-size:12px;color:var(--accent-light)">
+          <strong>v5.0 покрытие:</strong> ${m.v5Fix}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const oppsList = document.getElementById('exp-opportunities-list');
+  if (oppsList) {
+    oppsList.innerHTML = data.topMissedOpportunities.map(o => `
+      <div class="card-inset" style="margin-bottom:10px;padding:12px;border-left:3px solid var(--warning)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <strong style="font-size:13px">${o.opportunity}</strong>
+          <span class="badge badge-warning">${o.count} случаев</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin:0">${o.description}</p>
+      </div>
+    `).join('');
+  }
+
+  const newPatternsEl = document.getElementById('exp-new-patterns');
+  if (newPatternsEl) {
+    newPatternsEl.innerHTML = data.newPatterns.map(p => `
+      <div class="card-inset" style="margin-bottom:12px;padding:14px;border-left:4px solid var(--success-light)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <strong style="font-size:14px;color:var(--success-light)">🆕 ${p.pattern}</strong>
+          <span class="badge badge-success">${p.occurrences} случаев</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);margin:6px 0">${p.description}</p>
+        <div style="margin-top:8px;padding:8px;background:rgba(46,213,115,0.08);border-radius:6px;font-size:12px">
+          <strong style="color:var(--success-light)">Рекомендация:</strong> <span style="color:var(--text-muted)">${p.recommendation}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const v6El = document.getElementById('exp-v6-improvements');
+  if (v6El) {
+    v6El.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Приоритет</th><th>Улучшение</th><th>Проблема</th><th>Решение</th><th>Потенциал</th></tr></thead>
+          <tbody>
+            ${data.v6RecommendedImprovements.map(i => `
+              <tr>
+                <td><span class="badge ${i.priority === 'P0' ? 'badge-danger' : i.priority === 'P1' ? 'badge-warning' : 'badge-accent'}">${i.priority}</span></td>
+                <td><strong>${i.title}</strong></td>
+                <td style="font-size:12px;color:var(--text-muted)">${i.problem}</td>
+                <td style="font-size:12px;color:var(--text-muted)">${i.solution}</td>
+                <td style="font-size:12px;color:var(--success-light)"><strong>${i.impact}</strong></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  const cmpEl = document.getElementById('exp-comparison');
+  if (cmpEl) {
+    const c = data.comparisonWithDetailedAnalysis;
+    cmpEl.innerHTML = `
+      <div class="grid-2">
+        <div>
+          <h4 style="color:var(--success-light);margin:0 0 8px 0">✓ Подтверждённые паттерны</h4>
+          <ul style="margin:0;padding-left:20px;font-size:13px;color:var(--text-muted);line-height:1.8">
+            ${c.confirmed.map(x => `<li>${x}</li>`).join('')}
+          </ul>
+        </div>
+        <div>
+          <h4 style="color:var(--warning);margin:0 0 8px 0">🆕 Новые в выборке 164</h4>
+          <ul style="margin:0;padding-left:20px;font-size:13px;color:var(--text-muted);line-height:1.8">
+            ${c.new.map(x => `<li>${x}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  setTimeout(() => initExpandedCharts(data), 100);
+}
+
+function severityColor(s) {
+  return { critical: 'var(--danger-light)', high: 'var(--danger-light)', medium: 'var(--warning)', low: 'var(--text-muted)' }[s] || 'var(--text-muted)';
+}
+function severityBadge(s) {
+  return { critical: 'badge-danger', high: 'badge-danger', medium: 'badge-warning', low: 'badge-accent' }[s] || 'badge-accent';
+}
+function formatCategoryName(c) {
+  return c.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function initExpandedCharts(data) {
+  const reasonsCanvas = document.getElementById('expReasonsChart');
+  if (reasonsCanvas && typeof Chart !== 'undefined') {
+    if (reasonsCanvas._chart) reasonsCanvas._chart.destroy();
+    reasonsCanvas._chart = new Chart(reasonsCanvas, {
+      type: 'bar',
+      data: {
+        labels: data.topReasons.map(r => formatCategoryName(r.category)),
+        datasets: [{
+          label: 'Случаев из 164',
+          data: data.topReasons.map(r => r.count),
+          backgroundColor: data.topReasons.map(r => severityRGBA(r.severity)),
+          borderColor: data.topReasons.map(r => severityRGBA(r.severity, 1)),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          y: { ticks: { color: '#e5e7eb', font: { size: 11 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  const compCanvas = document.getElementById('expComplianceChart');
+  if (compCanvas && typeof Chart !== 'undefined') {
+    if (compCanvas._chart) compCanvas._chart.destroy();
+    compCanvas._chart = new Chart(compCanvas, {
+      type: 'radar',
+      data: {
+        labels: data.scriptComplianceV5.elements.map(e => e.element.replace(/\(.+?\)/, '').trim()),
+        datasets: [{
+          label: 'Соответствие v5.0 (%)',
+          data: data.scriptComplianceV5.elements.map(e => e.compliance),
+          backgroundColor: 'rgba(110, 193, 228, 0.2)',
+          borderColor: 'rgba(110, 193, 228, 1)',
+          borderWidth: 2,
+          pointBackgroundColor: 'rgba(110, 193, 228, 1)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#e5e7eb' } } },
+        scales: {
+          r: {
+            angleLines: { color: 'rgba(255,255,255,0.1)' },
+            grid: { color: 'rgba(255,255,255,0.1)' },
+            pointLabels: { color: '#e5e7eb', font: { size: 11 } },
+            ticks: { color: '#9ca3af', backdropColor: 'transparent' },
+            min: 0,
+            max: 100
+          }
+        }
+      }
+    });
+  }
+}
+
+function severityRGBA(s, alpha = 0.7) {
+  const colors = {
+    critical: `rgba(231, 76, 60, ${alpha})`,
+    high: `rgba(230, 126, 34, ${alpha})`,
+    medium: `rgba(241, 196, 15, ${alpha})`,
+    low: `rgba(149, 165, 166, ${alpha})`
+  };
+  return colors[s] || colors.low;
 }
 
 function escapeAndFormat(text) {
