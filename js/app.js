@@ -622,40 +622,46 @@ function renderExpanded() {
 
   const reasonsList = document.getElementById('exp-reasons-list');
   if (reasonsList) {
-    reasonsList.innerHTML = data.topReasons.map(r => `
+    reasonsList.innerHTML = data.topReasons.map(r => {
+      const examples = Array.isArray(r.examples) ? r.examples : [];
+      return `
       <div class="card-inset" style="border-left:4px solid ${severityColor(r.severity)};margin-bottom:12px;padding:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <strong style="font-size:14px">${formatCategoryName(r.category)}</strong>
           <span class="badge ${severityBadge(r.severity)}">${r.count} (${r.pct}%) — ${r.severity}</span>
         </div>
         <p style="font-size:13px;color:var(--text-muted);margin:6px 0">${r.description}</p>
-        <details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--accent-light)">Цитаты клиентов (${r.examples.length})</summary>
+        ${examples.length ? `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--accent-light)">Цитаты клиентов (${examples.length})</summary>
           <ul style="margin:8px 0 0 16px;font-size:12px;color:var(--text-muted)">
-            ${r.examples.map(e => `<li style="margin:4px 0"><em>${e}</em></li>`).join('')}
+            ${examples.map(e => `<li style="margin:4px 0"><em>${e}</em></li>`).join('')}
           </ul>
-        </details>
+        </details>` : ''}
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   const mistakesList = document.getElementById('exp-mistakes-list');
   if (mistakesList) {
-    mistakesList.innerHTML = data.topManagerMistakes.map(m => `
+    mistakesList.innerHTML = data.topManagerMistakes.map(m => {
+      const examples = Array.isArray(m.examples) ? m.examples : [];
+      return `
       <div class="card-inset" style="border-left:4px solid ${severityColor(m.severity)};margin-bottom:12px;padding:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <strong style="font-size:14px">${m.mistake}</strong>
           <span class="badge ${severityBadge(m.severity)}">${m.count} (${m.pct}%)</span>
         </div>
-        <details style="margin-top:6px"><summary style="cursor:pointer;font-size:12px;color:var(--accent-light)">Примеры (${m.examples.length})</summary>
+        ${examples.length ? `<details style="margin-top:6px"><summary style="cursor:pointer;font-size:12px;color:var(--accent-light)">Примеры (${examples.length})</summary>
           <ul style="margin:8px 0 0 16px;font-size:12px;color:var(--text-muted)">
-            ${m.examples.map(e => `<li style="margin:4px 0">${e}</li>`).join('')}
+            ${examples.map(e => `<li style="margin:4px 0">${e}</li>`).join('')}
           </ul>
-        </details>
-        <div style="margin-top:8px;padding:8px;background:rgba(110,193,228,0.08);border-radius:6px;font-size:12px;color:var(--accent-light)">
+        </details>` : ''}
+        ${m.v5Fix ? `<div style="margin-top:8px;padding:8px;background:rgba(110,193,228,0.08);border-radius:6px;font-size:12px;color:var(--accent-light)">
           <strong>v5.0 покрытие:</strong> ${m.v5Fix}
-        </div>
+        </div>` : ''}
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   const oppsList = document.getElementById('exp-opportunities-list');
