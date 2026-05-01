@@ -552,15 +552,65 @@ function renderExpanded() {
     `;
   }
 
-  const managersEl = document.getElementById('exp-managers');
-  if (managersEl && data.topManagers) {
-    managersEl.innerHTML = data.topManagers.map(m => `
-      <div class="card-inset" style="margin-bottom:10px;padding:12px;border-left:3px solid var(--accent-light)">
-        <strong style="font-size:14px;display:block;margin-bottom:6px">${m.name}</strong>
-        <div style="font-size:12px;color:var(--success-light);margin-bottom:4px"><strong>+ Сильное:</strong> <span style="color:var(--text-muted)">${m.strength}</span></div>
-        <div style="font-size:12px;color:var(--warning)"><strong>− Слабое:</strong> <span style="color:var(--text-muted)">${m.weakness}</span></div>
+  const missEl = document.getElementById('exp-what-we-miss');
+  if (missEl && data.whatWeMiss) {
+    missEl.innerHTML = data.whatWeMiss.map((w, i) => `
+      <div class="card-inset" style="margin-bottom:14px;padding:16px;border-left:5px solid var(--danger-light);background:rgba(231,76,60,0.05)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px">
+          <strong style="font-size:15px;color:var(--danger-light)">${i+1}. ${w.title}</strong>
+          <span class="badge badge-danger" style="white-space:nowrap">${w.lostCount} (${w.pct}%)</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:6px 0 12px 0">${w.details}</p>
+        <div style="padding:10px 12px;background:rgba(46,213,115,0.08);border-left:3px solid var(--success-light);border-radius:6px;font-size:13px;line-height:1.6">
+          <strong style="color:var(--success-light)">→ Как закрыть:</strong> <span style="color:var(--text-muted)">${w.whatToDo}</span>
+        </div>
       </div>
     `).join('');
+  }
+
+  const planEl = document.getElementById('exp-conversion-plan');
+  if (planEl && data.conversionLeverPlan) {
+    const p = data.conversionLeverPlan;
+    const effortLabel = (e) => ({ low: '🟢 низкий', medium: '🟡 средний', high: '🔴 высокий' }[e] || e);
+    planEl.innerHTML = `
+      <div class="stats-grid" style="margin-bottom:18px">
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--text-muted);font-size:28px">${p.currentConversion}%</div>
+          <div class="stat-label">Текущая конверсия</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--success-light);font-size:28px">${p.targetConversion}%</div>
+          <div class="stat-label">Целевая конверсия</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--accent-light);font-size:28px">+${p.deltaPotential}п.п.</div>
+          <div class="stat-label">Потенциал роста</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--warning);font-size:28px">10</div>
+          <div class="stat-label">Рычагов в плане</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);font-style:italic;margin:0 0 14px 0">${p.note}</p>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Рычаг</th><th>Текущая потеря</th><th>Эффект</th><th>Усилие</th><th>Срок</th><th>Как</th></tr></thead>
+          <tbody>
+            ${p.levers.map(l => `
+              <tr>
+                <td><strong style="color:var(--accent-light);font-size:16px">${l.rank}</strong></td>
+                <td><strong>${l.lever}</strong></td>
+                <td style="font-size:12px;color:var(--danger-light)">${l.currentMiss}</td>
+                <td><span class="badge badge-success">+${l.impact}п.п.</span></td>
+                <td style="font-size:12px">${effortLabel(l.effort)}</td>
+                <td style="font-size:12px;color:var(--text-muted)">${l.timeToImpact}</td>
+                <td style="font-size:12px;color:var(--text-muted);max-width:280px">${l.explanation}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 
   const successEl = document.getElementById('exp-success-patterns');
