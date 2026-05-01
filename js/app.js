@@ -15,13 +15,29 @@ document.addEventListener('DOMContentLoaded', () => {
 function initNavigation() {
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
-      const target = item.dataset.page;
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      item.classList.add('active');
-      document.getElementById(`page-${target}`).classList.add('active');
+      goToPage(item.dataset.page);
     });
   });
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const target = el.dataset.goto;
+      if (!target) return;
+      e.stopPropagation();
+      goToPage(target);
+    });
+  });
+}
+
+function goToPage(target) {
+  if (!target) return;
+  const navItem = document.querySelector(`.nav-item[data-page="${target}"]`);
+  const pageEl = document.getElementById(`page-${target}`);
+  if (!navItem || !pageEl) return;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  navItem.classList.add('active');
+  pageEl.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 const CATEGORY_LABELS = {
@@ -82,29 +98,11 @@ function leadLink(id, label) {
 }
 
 function renderOverview() {
-  const results = typeof ANALYSIS_RESULTS !== 'undefined' ? Object.values(ANALYSIS_RESULTS) : [];
+  const expanded = typeof EXPANDED_ANALYSIS !== 'undefined' ? EXPANDED_ANALYSIS : null;
   const report = typeof REPORT_DATA !== 'undefined' ? REPORT_DATA : {};
-  const correlations = typeof CORRELATIONS_DATA !== 'undefined' ? CORRELATIONS_DATA : {};
-
-  document.getElementById('stat-total-calls').textContent = results.length;
-
-  const cats = correlations.local?.byCategory || {};
-  const topCat = Object.entries(cats).sort((a, b) => b[1] - a[1])[0];
-  if (topCat) {
-    const pct = Math.round(topCat[1] / results.length * 100);
-    document.getElementById('stat-top-category').textContent = `${pct}%`;
-    document.getElementById('stat-top-category-label').textContent = getCatLabel(topCat[0]);
-  }
-
-  document.getElementById('stat-crm-matched').textContent =
-    `${correlations.local?.crmMatching?.matchedWithCRM || 0}/${results.length}`;
-
-  const themes = correlations.local?.objectionThemes || {};
-  document.getElementById('stat-objection-themes').textContent = Object.keys(themes).length;
-
   const overviewText = document.getElementById('overview-text');
-  if (overviewText && report.overview) {
-    overviewText.textContent = report.overview;
+  if (overviewText) {
+    overviewText.textContent = (expanded && expanded.overview) || report.overview || '';
   }
 }
 

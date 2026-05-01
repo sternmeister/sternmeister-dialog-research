@@ -118,6 +118,19 @@ body {
 }
 
 .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.stat-card-clickable { cursor: pointer; position: relative; }
+.stat-card-clickable::after {
+  content: '→';
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.stat-card-clickable:hover::after { opacity: 1; transform: translateX(4px); color: var(--accent-light); }
+.stat-card-clickable:hover { box-shadow: 0 4px 24px rgba(108, 92, 231, 0.15); }
 
 .stat-value {
   font-size: 32px;
