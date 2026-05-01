@@ -34,7 +34,7 @@
         <span class="nav-icon">📋</span> Отчёт
       </div>
       <div class="nav-item" data-page="expanded">
-        <span class="nav-icon">🔬</span> Макро-анализ (164)
+        <span class="nav-icon">🔬</span> Макро-анализ (1026)
       </div>
       <div style="border-top:1px solid var(--border);margin:12px 0"></div>
       <div class="nav-item" data-page="script-audit">
@@ -51,7 +51,7 @@
       <div id="page-overview" class="page active">
         <div class="page-header">
           <h2>Обзор анализа</h2>
-          <p>Мультиагентный анализ диалогов менеджеров Sternmeister: <strong>52 детальных + 164 в макро-выборке</strong> (полный корпус 1100+)</p>
+          <p>Мультиагентный анализ диалогов менеджеров Sternmeister: <strong>52 детальных + полный корпус 1026 звонков</strong> (5 партий × ~200 звонков)</p>
         </div>
 
         <div class="stats-grid">
@@ -200,21 +200,21 @@
         </div>
       </div>
 
-      <!-- МАКРО-АНАЛИЗ 164 ЗВОНКОВ -->
+      <!-- МАКРО-АНАЛИЗ ПОЛНОГО КОРПУСА 1026 ЗВОНКОВ -->
       <div id="page-expanded" class="page">
         <div class="page-header">
-          <h2>Макро-анализ — выборка 164 звонков</h2>
-          <p id="expanded-meta">Расширенный анализ корпуса транскрипций</p>
+          <h2>Макро-анализ — полный корпус 1026 звонков</h2>
+          <p id="expanded-meta">Полный анализ корпуса транскрипций (5 партий по ~200 звонков)</p>
         </div>
 
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-value" style="color:var(--accent-light)" id="exp-stat-sample">—</div>
-            <div class="stat-label">Звонков в выборке</div>
+            <div class="stat-label">Звонков обработано</div>
           </div>
           <div class="stat-card">
             <div class="stat-value" style="color:var(--warning)" id="exp-stat-corpus">—</div>
-            <div class="stat-label">Полный корпус</div>
+            <div class="stat-label">Уникальных лидов</div>
           </div>
           <div class="stat-card">
             <div class="stat-value" style="color:var(--danger-light)" id="exp-stat-compliance">—</div>
@@ -233,7 +233,7 @@
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-title">Топ причин незакрытия (164 звонка)</div>
+            <div class="card-title">Топ причин незакрытия (1026 звонков)</div>
             <div class="chart-container" style="height:340px">
               <canvas id="expReasonsChart"></canvas>
             </div>
@@ -262,7 +262,22 @@
         </div>
 
         <div class="card">
-          <div class="card-title">🆕 Новые паттерны (отсутствовали в выборке 52)</div>
+          <div class="card-title">📊 Разбивка по партиям</div>
+          <div id="exp-batches"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🏆 Менеджеры — сильные и слабые стороны</div>
+          <div id="exp-managers"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">✅ Паттерны успешных закрытий</div>
+          <div id="exp-success-patterns"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🆕 Новые паттерны на масштабе корпуса</div>
           <div id="exp-new-patterns"></div>
         </div>
 
@@ -272,7 +287,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title">Сравнение: 52 звонка (детально) vs 164 звонка (макро)</div>
+          <div class="card-title">Сравнение: 52 звонка (детально) vs 1026 звонков (полный корпус)</div>
           <div id="exp-comparison"></div>
         </div>
       </div>

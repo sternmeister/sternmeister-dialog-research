@@ -524,10 +524,53 @@ function renderExpanded() {
 
   const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   setText('exp-stat-sample', data.sampleSize);
-  setText('exp-stat-corpus', `${data.totalCorpus}+`);
+  setText('exp-stat-corpus', data.uniqueLeads || `${data.totalCorpus}+`);
   setText('exp-stat-compliance', `${data.scriptComplianceV5.overall}%`);
   setText('exp-stat-new', data.newPatterns.length);
   setText('exp-overview', data.overview);
+
+  const batchesEl = document.getElementById('exp-batches');
+  if (batchesEl && data.perBatch) {
+    batchesEl.innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Партия</th><th>Файлы</th><th>Звонков</th><th>Успешных закрытий</th><th>Конверсия</th><th>Период</th></tr></thead>
+          <tbody>
+            ${data.perBatch.map(b => `
+              <tr>
+                <td><strong>#${b.id}</strong></td>
+                <td style="font-family:monospace;font-size:12px">${b.files}</td>
+                <td>${b.sample}</td>
+                <td style="color:var(--success-light)"><strong>${b.successful}</strong></td>
+                <td><span class="badge badge-accent">${(b.successful / b.sample * 100).toFixed(1)}%</span></td>
+                <td style="font-size:12px;color:var(--text-muted)">${b.period}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  const managersEl = document.getElementById('exp-managers');
+  if (managersEl && data.topManagers) {
+    managersEl.innerHTML = data.topManagers.map(m => `
+      <div class="card-inset" style="margin-bottom:10px;padding:12px;border-left:3px solid var(--accent-light)">
+        <strong style="font-size:14px;display:block;margin-bottom:6px">${m.name}</strong>
+        <div style="font-size:12px;color:var(--success-light);margin-bottom:4px"><strong>+ Сильное:</strong> <span style="color:var(--text-muted)">${m.strength}</span></div>
+        <div style="font-size:12px;color:var(--warning)"><strong>− Слабое:</strong> <span style="color:var(--text-muted)">${m.weakness}</span></div>
+      </div>
+    `).join('');
+  }
+
+  const successEl = document.getElementById('exp-success-patterns');
+  if (successEl && data.successfulClosurePatterns) {
+    successEl.innerHTML = `
+      <ul style="margin:0;padding-left:20px;font-size:13px;color:var(--text-muted);line-height:1.9">
+        ${data.successfulClosurePatterns.map(p => `<li>${p}</li>`).join('')}
+      </ul>
+    `;
+  }
 
   const reasonsList = document.getElementById('exp-reasons-list');
   if (reasonsList) {
@@ -621,18 +664,20 @@ function renderExpanded() {
   const cmpEl = document.getElementById('exp-comparison');
   if (cmpEl) {
     const c = data.comparisonWithDetailedAnalysis;
+    const confirmed = c.confirmedAtScale || c.confirmed || [];
+    const newItems = c.newAtScale || c.new || [];
     cmpEl.innerHTML = `
       <div class="grid-2">
         <div>
-          <h4 style="color:var(--success-light);margin:0 0 8px 0">✓ Подтверждённые паттерны</h4>
+          <h4 style="color:var(--success-light);margin:0 0 8px 0">✓ Подтверждённые паттерны на масштабе</h4>
           <ul style="margin:0;padding-left:20px;font-size:13px;color:var(--text-muted);line-height:1.8">
-            ${c.confirmed.map(x => `<li>${x}</li>`).join('')}
+            ${confirmed.map(x => `<li>${x}</li>`).join('')}
           </ul>
         </div>
         <div>
-          <h4 style="color:var(--warning);margin:0 0 8px 0">🆕 Новые в выборке 164</h4>
+          <h4 style="color:var(--warning);margin:0 0 8px 0">🆕 Новые на масштабе корпуса</h4>
           <ul style="margin:0;padding-left:20px;font-size:13px;color:var(--text-muted);line-height:1.8">
-            ${c.new.map(x => `<li>${x}</li>`).join('')}
+            ${newItems.map(x => `<li>${x}</li>`).join('')}
           </ul>
         </div>
       </div>
@@ -661,7 +706,7 @@ function initExpandedCharts(data) {
       data: {
         labels: data.topReasons.map(r => formatCategoryName(r.category)),
         datasets: [{
-          label: 'Случаев из 164',
+          label: 'Случаев из 1026',
           data: data.topReasons.map(r => r.count),
           backgroundColor: data.topReasons.map(r => severityRGBA(r.severity)),
           borderColor: data.topReasons.map(r => severityRGBA(r.severity, 1)),
