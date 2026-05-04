@@ -15,40 +15,78 @@
         <h1>Sternmeister</h1>
         <p>Dialog Research System</p>
       </div>
-      <div class="nav-item active" data-page="overview">
+      <div class="nav-group-label">Для менеджеров</div>
+      <div class="nav-item nav-item-primary active" data-page="battle-script" role="button" tabindex="0">
+        <span class="nav-icon">📞</span> Боевой скрипт v5.1
+      </div>
+      <div class="nav-group-label">Аналитика</div>
+      <div class="nav-item" data-page="overview" role="button" tabindex="0">
         <span class="nav-icon">📊</span> Обзор
       </div>
-      <div class="nav-item" data-page="correlations">
+      <!-- Боевой скрипт активен по умолчанию — это главный инструмент для менеджеров.
+           Если хочется оставить «Обзор» по умолчанию — перенесите класс .active с «battle-script» на «overview». -->
+      <div class="nav-item" data-page="correlations" role="button" tabindex="0">
         <span class="nav-icon">🔗</span> Корреляции
       </div>
-      <div class="nav-item" data-page="calls">
+      <div class="nav-item" data-page="calls" role="button" tabindex="0">
         <span class="nav-icon">📞</span> Анализ звонков
       </div>
-      <div class="nav-item" data-page="objections">
+      <div class="nav-item" data-page="objections" role="button" tabindex="0">
         <span class="nav-icon">🛡</span> Возражения
       </div>
-      <div class="nav-item" data-page="recommendations">
+      <div class="nav-item" data-page="recommendations" role="button" tabindex="0">
         <span class="nav-icon">💡</span> Рекомендации
       </div>
-      <div class="nav-item" data-page="report">
+      <div class="nav-item" data-page="report" role="button" tabindex="0">
         <span class="nav-icon">📋</span> Отчёт
       </div>
-      <div class="nav-item" data-page="expanded">
+      <div class="nav-item" data-page="expanded" role="button" tabindex="0">
         <span class="nav-icon">🔬</span> Макро-анализ (1026)
       </div>
       <div style="border-top:1px solid var(--border);margin:12px 0"></div>
-      <div class="nav-item" data-page="script-audit">
+      <div class="nav-item" data-page="script-audit" role="button" tabindex="0">
         <span class="nav-icon">🔍</span> Аудит скрипта
       </div>
-      <div class="nav-item" data-page="new-script">
+      <div class="nav-item" data-page="new-script" role="button" tabindex="0">
         <span class="nav-icon">📝</span> Скрипт v6.0
       </div>
     </nav>
 
     <main class="main">
 
+      <!-- БОЕВОЙ СКРИПТ v5.1 (для менеджеров) -->
+      <div id="page-battle-script" class="page active">
+        <div class="page-header battle-header">
+          <div class="battle-title-row">
+            <div>
+              <h2 id="bs-title">Боевой скрипт GosBuh v5.1</h2>
+              <p id="bs-subtitle"></p>
+            </div>
+            <div class="battle-badges">
+              <span class="badge badge-accent" id="bs-target">Termin 35%+</span>
+              <span class="badge badge-success" id="bs-top">Михолап · 22.1%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-toolbar">
+          <input type="text" id="bs-search" class="bs-search" placeholder="🔍 Поиск по скрипту, возражениям, сегментам, историям...">
+          <div class="bs-tabs">
+            <button class="bs-tab active" data-tab="stages">📋 Этапы (18)</button>
+            <button class="bs-tab" data-tab="objections">🛡️ Возражения (22)</button>
+            <button class="bs-tab" data-tab="segments">🎯 Сегменты (12)</button>
+            <button class="bs-tab" data-tab="stories">📖 Истории (6)</button>
+            <button class="bs-tab" data-tab="whatsapp">💬 WhatsApp</button>
+            <button class="bs-tab" data-tab="checklist">✅ Чек-лист</button>
+            <button class="bs-tab" data-tab="cheatsheet">⚡ Шпаргалка</button>
+          </div>
+        </div>
+
+        <div id="bs-content"></div>
+      </div>
+
       <!-- ОБЗОР -->
-      <div id="page-overview" class="page active">
+      <div id="page-overview" class="page">
         <div class="page-header">
           <h2>Обзор анализа</h2>
           <p>Мультиагентный анализ диалогов менеджеров Sternmeister: <strong>52 детальных + полный корпус 1026 звонков</strong> (5 партий × ~200 звонков)</p>
@@ -349,6 +387,7 @@
   <script src="data/correlations.js"></script>
   <script src="data/report.js"></script>
   <script src="data/expanded-analysis.js"></script>
+  <script src="data/battle-script.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/app.js"></script>
 </body>

@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderExpanded();
   renderScriptAudit();
   renderNewScript();
+  renderBattleScript();
   initCharts();
 });
 
@@ -836,4 +837,365 @@ function escapeAndFormat(text) {
     .replace(/📍|📋|👨‍👩‍👧|🗣|🏫|⏰|☐|✅|❌|⛔️/g, m => `<span class="script-emoji">${m}</span>`)
     .replace(/«([^»]+)»/g, '<em class="script-quote">«$1»</em>')
     .replace(/→/g, '<span style="color:var(--accent-light)">→</span>');
+}
+
+// =====================================================
+// БОЕВОЙ СКРИПТ v5.1 — для менеджеров
+// =====================================================
+
+const BS_STATE = { tab: 'stages', search: '', expanded: new Set() };
+
+function renderBattleScript() {
+  if (typeof BATTLE_SCRIPT === 'undefined') return;
+  const m = BATTLE_SCRIPT.meta;
+
+  const tEl = document.getElementById('bs-title');
+  if (tEl) tEl.textContent = m.title;
+  const sEl = document.getElementById('bs-subtitle');
+  if (sEl) sEl.textContent = `${m.subtitle} · версия ${m.version} · ${m.date}`;
+  const tgEl = document.getElementById('bs-target');
+  if (tgEl) tgEl.textContent = `Цель: ${m.target}`;
+  const topEl = document.getElementById('bs-top');
+  if (topEl) topEl.textContent = `TOP: ${m.topPerformer}`;
+
+  document.querySelectorAll('.bs-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.bs-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      BS_STATE.tab = tab.dataset.tab;
+      renderBSContent();
+    });
+  });
+
+  const search = document.getElementById('bs-search');
+  if (search) {
+    search.addEventListener('input', (e) => {
+      BS_STATE.search = e.target.value.toLowerCase().trim();
+      renderBSContent();
+    });
+  }
+
+  renderBSContent();
+}
+
+function renderBSContent() {
+  const root = document.getElementById('bs-content');
+  if (!root) return;
+  const t = BS_STATE.tab;
+  if (t === 'stages') root.innerHTML = renderBSStages();
+  else if (t === 'objections') root.innerHTML = renderBSObjections();
+  else if (t === 'segments') root.innerHTML = renderBSSegments();
+  else if (t === 'stories') root.innerHTML = renderBSStories();
+  else if (t === 'whatsapp') root.innerHTML = renderBSWhatsapp();
+  else if (t === 'checklist') root.innerHTML = renderBSChecklist();
+  else if (t === 'cheatsheet') root.innerHTML = renderBSCheatsheet();
+  attachBSCopyHandlers();
+  attachBSToggleHandlers();
+  attachBSChecklistHandlers();
+}
+
+function bsMatchSearch(...texts) {
+  const q = BS_STATE.search;
+  if (!q) return true;
+  return texts.some(t => (t || '').toLowerCase().includes(q));
+}
+
+function bsCopyButton(text) {
+  const safe = text.replace(/`/g, '\\`').replace(/\\/g, '\\\\').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+  return `<button class="bs-copy" data-copy="${safe}" title="Скопировать в буфер">📋 Копировать</button>`;
+}
+
+function attachBSCopyHandlers() {
+  document.querySelectorAll('.bs-copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copy.replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✅ Скопировано';
+        btn.classList.add('bs-copy-ok');
+        setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('bs-copy-ok'); }, 1400);
+      } catch (e) {
+        btn.innerHTML = '❌ Ошибка';
+      }
+    });
+  });
+}
+
+function attachBSToggleHandlers() {
+  document.querySelectorAll('.bs-stage-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const card = header.closest('.bs-stage');
+      const id = card.dataset.id;
+      card.classList.toggle('expanded');
+      if (card.classList.contains('expanded')) BS_STATE.expanded.add(id);
+      else BS_STATE.expanded.delete(id);
+    });
+  });
+  document.querySelectorAll('.bs-obj-header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.closest('.bs-obj').classList.toggle('expanded');
+    });
+  });
+}
+
+function attachBSChecklistHandlers() {
+  const items = document.querySelectorAll('.bs-check-item');
+  const total = document.getElementById('bs-check-total');
+  if (!items.length || !total) return;
+  const max = BATTLE_SCRIPT.checklist.reduce((s, g) => s + g.items.reduce((s2, i) => s2 + i.points, 0), 0);
+  const update = () => {
+    let sum = 0;
+    items.forEach(it => {
+      if (it.classList.contains('checked')) sum += parseInt(it.dataset.points, 10);
+    });
+    total.textContent = sum;
+    const pct = sum / max;
+    let level = '🥉 Средне';
+    let cls = 'badge-warning';
+    if (pct >= 0.8) { level = '🥇 Топ'; cls = 'badge-success'; }
+    else if (pct >= 0.6) { level = '🥈 Хорошо'; cls = 'badge-success'; }
+    else if (pct < 0.4) { level = '⚠️ Коучинг'; cls = 'badge-danger'; }
+    const lvlEl = document.getElementById('bs-check-level');
+    if (lvlEl) { lvlEl.textContent = level; lvlEl.className = `badge ${cls}`; }
+  };
+  items.forEach(it => {
+    it.addEventListener('click', () => { it.classList.toggle('checked'); update(); });
+  });
+  update();
+}
+
+function bsRenderBlock(b) {
+  const text = (b.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const formatted = text.replace(/\n/g, '<br>');
+  if (b.type === 'tip') {
+    return `<div class="bs-block bs-block-tip">
+      <div class="bs-block-title">💡 ${b.title || 'Совет'}</div>
+      <div class="bs-block-text">${formatted}</div>
+    </div>`;
+  }
+  if (b.type === 'warning') {
+    return `<div class="bs-block bs-block-warning">
+      <div class="bs-block-title">⚠️ ${b.title || ''}</div>
+      <div class="bs-block-text">${formatted}</div>
+    </div>`;
+  }
+  if (b.type === 'checklist') {
+    return `<div class="bs-block bs-block-checklist">
+      <div class="bs-block-title">${b.title || ''}</div>
+      <ol class="bs-list">${b.items.map(i => `<li>${i}</li>`).join('')}</ol>
+    </div>`;
+  }
+  return `<div class="bs-block bs-block-script">
+    <div class="bs-block-head">
+      <div class="bs-block-title">${b.title || ''}</div>
+      ${bsCopyButton(b.text || '')}
+    </div>
+    <div class="bs-block-text bs-quote">${formatted}</div>
+    ${b.why ? `<div class="bs-why"><strong>Почему:</strong> ${b.why.replace(/\n/g, '<br>')}</div>` : ''}
+  </div>`;
+}
+
+function renderBSStages() {
+  const stages = BATTLE_SCRIPT.stages.filter(s => {
+    const blocksText = s.blocks.map(b => (b.title || '') + ' ' + (b.text || '') + ' ' + (b.items || []).join(' ')).join(' ');
+    return bsMatchSearch(s.title, s.subtitle, blocksText);
+  });
+  if (!stages.length) return `<div class="card">Ничего не найдено по запросу «${BS_STATE.search}»</div>`;
+
+  return stages.map((s, i) => {
+    const expanded = BS_STATE.expanded.has(s.id) || BS_STATE.search;
+    const isNew = s.isNew ? '<span class="badge badge-success" style="margin-left:8px">НОВОЕ v5.1</span>' : '';
+    const hasKey = s.blocks.some(b => b.isKey);
+    const keyBadge = hasKey ? '<span class="badge badge-warning" style="margin-left:8px">⭐ KEY</span>' : '';
+    return `<div class="bs-stage ${expanded ? 'expanded' : ''}" data-id="${s.id}">
+      <div class="bs-stage-header">
+        <div class="bs-stage-num">${i + 1}</div>
+        <div class="bs-stage-icon">${s.icon}</div>
+        <div class="bs-stage-info">
+          <div class="bs-stage-title">${s.title}${isNew}${keyBadge}</div>
+          <div class="bs-stage-subtitle">${s.subtitle} · ⏱ ${s.time}</div>
+        </div>
+        <div class="bs-stage-toggle">▼</div>
+      </div>
+      <div class="bs-stage-body">
+        ${s.blocks.map(bsRenderBlock).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderBSObjections() {
+  const objs = BATTLE_SCRIPT.objections.filter(o => bsMatchSearch(o.title, o.response, o.cat, o.why));
+  const cats = [...new Set(BATTLE_SCRIPT.objections.map(o => o.cat))];
+
+  if (!objs.length) return `<div class="card">Ничего не найдено по запросу «${BS_STATE.search}»</div>`;
+
+  return `<div class="bs-obj-intro card">
+    <strong>Voss-протокол перед каждой отработкой:</strong>
+    <ol class="bs-list">
+      <li>ПАУЗА 5 секунд после возражения</li>
+      <li>MIRROR — повтори последние 3 слова с восходящей интонацией</li>
+      <li>LABEL — назови эмоцию: «Похоже, вас цена смутила»</li>
+      <li>CALIBRATED Q — «Что заставляет вас так говорить?»</li>
+      <li>И только потом — формула отработки</li>
+    </ol>
+    <div style="margin-top:12px;color:var(--text-muted);font-size:13px">«Возражения крепнут от спора, умирают от согласия» (Voss)</div>
+  </div>
+  ${objs.map(o => {
+    const newBadge = o.isNew ? '<span class="badge badge-success" style="margin-left:6px">НОВОЕ</span>' : '';
+    const keyBadge = o.isKey ? '<span class="badge badge-warning" style="margin-left:6px">⭐ KEY</span>' : '';
+    const text = (o.response || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    return `<div class="bs-obj">
+      <div class="bs-obj-header">
+        <div class="bs-obj-num">#${o.num}</div>
+        <div class="bs-obj-cat">${o.cat}</div>
+        <div class="bs-obj-title">${o.title}${newBadge}${keyBadge}</div>
+        <div class="bs-stage-toggle">▼</div>
+      </div>
+      <div class="bs-obj-body">
+        <div class="bs-block-head">
+          <div class="bs-block-title">Что говорить</div>
+          ${bsCopyButton(o.response || '')}
+        </div>
+        <div class="bs-quote">${text}</div>
+        ${o.why ? `<div class="bs-why"><strong>Почему:</strong> ${o.why}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('')}`;
+}
+
+function renderBSSegments() {
+  const segs = BATTLE_SCRIPT.segments.filter(s => {
+    const blocksText = s.blocks.map(b => b.title + ' ' + b.text).join(' ');
+    return bsMatchSearch(s.title, blocksText, s.kpi);
+  });
+  if (!segs.length) return `<div class="card">Ничего не найдено по запросу «${BS_STATE.search}»</div>`;
+
+  return segs.map(s => `
+    <div class="bs-seg card">
+      <div class="bs-seg-header">
+        <div class="bs-seg-icon">${s.icon}</div>
+        <div>
+          <div class="bs-seg-title">${s.title}</div>
+          ${s.kpi ? `<div class="bs-seg-kpi">${s.kpi}</div>` : ''}
+        </div>
+      </div>
+      <div class="bs-seg-body">
+        ${s.blocks.map(b => `
+          <div class="bs-block bs-block-script">
+            <div class="bs-block-head">
+              <div class="bs-block-title">${b.title}</div>
+              ${bsCopyButton(b.text)}
+            </div>
+            <div class="bs-quote">${b.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderBSStories() {
+  const stories = BATTLE_SCRIPT.stories.filter(s => bsMatchSearch(s.name, s.text, s.use, s.meta));
+  if (!stories.length) return `<div class="card">Ничего не найдено по запросу «${BS_STATE.search}»</div>`;
+
+  return `<div class="bs-stories-intro card" style="border-left:3px solid var(--warning)">
+    <strong>⭐ Правило:</strong> минимум 1 история с ИМЕНЕМ выпускника в каждом звонке. <strong>+3 балла</strong> в чек-листе. Подобрана под сегмент = +2 балла. Выучить наизусть, не подсматривать в карточку.
+  </div>
+  ${stories.map(s => `
+    <div class="bs-story card">
+      <div class="bs-story-header">
+        <div class="bs-story-icon">${s.icon}</div>
+        <div>
+          <div class="bs-story-name">${s.name}</div>
+          <div class="bs-story-meta">${s.meta}</div>
+        </div>
+        ${bsCopyButton(s.text)}
+      </div>
+      <div class="bs-quote">${s.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>
+      <div class="bs-why"><strong>Использование:</strong> ${s.use}</div>
+    </div>
+  `).join('')}`;
+}
+
+function renderBSWhatsapp() {
+  const w = BATTLE_SCRIPT.whatsapp;
+  const cadence = w.cadence.filter(c => bsMatchSearch(c.day, c.text, c.note));
+  const templates = w.templates.filter(t => bsMatchSearch(t.title, t.text, t.note));
+
+  return `<div class="card" style="border-left:3px solid var(--success)">
+    <strong>⭐ Михолап signature 92.6%</strong> — секрет TOP-перформера команды (Termin 22.1%). WhatsApp ВО ВРЕМЯ звонка, не после. KEY: +3 балла в чек-листе.
+  </div>
+  <h3 class="bs-section-title">Каденс касаний (7 шагов)</h3>
+  ${cadence.map(c => `
+    <div class="bs-cadence card">
+      <div class="bs-block-head">
+        <div class="bs-cadence-day">${c.day}</div>
+        ${bsCopyButton(c.text)}
+      </div>
+      <div class="bs-quote">${c.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>
+      <div class="bs-why">${c.note}</div>
+    </div>
+  `).join('')}
+  <h3 class="bs-section-title">Готовые шаблоны (3 шт)</h3>
+  ${templates.map(t => `
+    <div class="bs-tpl card">
+      <div class="bs-block-head">
+        <div class="bs-tpl-title">${t.title}</div>
+        ${bsCopyButton(t.text)}
+      </div>
+      <div class="bs-quote">${t.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>
+      <div class="bs-why">${t.note}</div>
+    </div>
+  `).join('')}`;
+}
+
+function renderBSChecklist() {
+  const groups = BATTLE_SCRIPT.checklist;
+  const max = groups.reduce((s, g) => s + g.items.reduce((s2, i) => s2 + i.points, 0), 0);
+  return `<div class="bs-check-summary card">
+    <div class="bs-check-total-wrap">
+      <div class="bs-check-total-num"><span id="bs-check-total">0</span> / ${max}</div>
+      <div class="bs-check-total-label">Mock-call evaluation</div>
+    </div>
+    <div class="bs-check-levels">
+      <div><span class="badge badge-success">🥇 ${Math.round(max*0.8)}+</span> Топ</div>
+      <div><span class="badge badge-success">🥈 ${Math.round(max*0.6)}–${Math.round(max*0.8)-1}</span> Хорошо</div>
+      <div><span class="badge badge-warning">🥉 ${Math.round(max*0.4)}–${Math.round(max*0.6)-1}</span> Средне</div>
+      <div><span class="badge badge-danger">&lt;${Math.round(max*0.4)}</span> Коучинг</div>
+    </div>
+    <div class="bs-check-result">Ваш уровень: <span class="badge" id="bs-check-level">—</span></div>
+  </div>
+  ${groups.map(g => `
+    <div class="bs-check-group card">
+      <div class="bs-check-group-title">${g.group}</div>
+      ${g.items.map(it => `
+        <div class="bs-check-item ${it.key ? 'bs-check-key' : ''}" data-points="${it.points}">
+          <div class="bs-check-box">☐</div>
+          <div class="bs-check-text">${it.text}</div>
+          <div class="bs-check-points">+${it.points}</div>
+          ${it.key ? '<div class="bs-check-keytag">KEY</div>' : ''}
+        </div>
+      `).join('')}
+    </div>
+  `).join('')}`;
+}
+
+function renderBSCheatsheet() {
+  const c = BATTLE_SCRIPT.cheatsheet;
+  return `<div class="bs-cheat-grid">
+    <div class="card bs-cheat-card bs-cheat-must">
+      <div class="card-title" style="color:var(--success-light)">✅ ОБЯЗАТЕЛЬНО СКАЗАТЬ (12)</div>
+      <ol class="bs-cheat-list">${c.must_say.map(i => `<li>${i}</li>`).join('')}</ol>
+    </div>
+    <div class="card bs-cheat-card bs-cheat-mustnot">
+      <div class="card-title" style="color:var(--danger-light)">❌ КАТЕГОРИЧЕСКИ НЕЛЬЗЯ (8)</div>
+      <ol class="bs-cheat-list">${c.must_not.map(i => `<li>${i}</li>`).join('')}</ol>
+    </div>
+    <div class="card bs-cheat-card bs-cheat-voss">
+      <div class="card-title" style="color:var(--accent-light)">🛡 VOSS-протокол на возражения (5 шагов)</div>
+      <ol class="bs-cheat-list bs-cheat-voss-list">${c.voss_protocol.map(i => `<li>${i}</li>`).join('')}</ol>
+    </div>
+  </div>`;
 }
