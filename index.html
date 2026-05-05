@@ -19,6 +19,9 @@
       <div class="nav-item nav-item-primary active" data-page="battle-script" role="button" tabindex="0">
         <span class="nav-icon">📞</span> Боевой скрипт v5.1
       </div>
+      <div class="nav-item nav-item-primary" data-page="onboarding" role="button" tabindex="0">
+        <span class="nav-icon">🎓</span> Инструкция (онбординг)
+      </div>
       <div class="nav-group-label">Аналитика</div>
       <div class="nav-item" data-page="overview" role="button" tabindex="0">
         <span class="nav-icon">📊</span> Обзор
@@ -72,7 +75,7 @@
         <div class="battle-toolbar">
           <input type="text" id="bs-search" class="bs-search" placeholder="🔍 Поиск по скрипту, возражениям, сегментам, историям...">
           <div class="bs-tabs">
-            <button class="bs-tab active" data-tab="stages">📋 Этапы (18)</button>
+            <button class="bs-tab active" data-tab="stages">📋 Этапы (14)</button>
             <button class="bs-tab" data-tab="objections">🛡️ Возражения (22)</button>
             <button class="bs-tab" data-tab="segments">🎯 Сегменты (12)</button>
             <button class="bs-tab" data-tab="stories">📖 Истории (6)</button>
@@ -83,6 +86,32 @@
         </div>
 
         <div id="bs-content"></div>
+      </div>
+
+      <!-- ОНБОРДИНГ — ИНСТРУКЦИЯ ДЛЯ МЕНЕДЖЕРОВ -->
+      <div id="page-onboarding" class="page">
+        <div class="page-header onb-header">
+          <div class="onb-title-row">
+            <div>
+              <h2>🎓 Онбординг: как пользоваться скриптом</h2>
+              <p id="onb-intro-text"></p>
+            </div>
+            <div class="battle-badges">
+              <span class="badge badge-accent">7 шагов</span>
+              <span class="badge badge-success">Termin 35%+</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-toolbar">
+          <div class="bs-tabs">
+            <button class="onb-tab active" data-otab="steps">📋 7 шагов онбординга</button>
+            <button class="onb-tab" data-otab="glossary">📚 Глоссарий</button>
+            <button class="onb-tab" data-otab="faq">❓ FAQ</button>
+          </div>
+        </div>
+
+        <div id="onb-content"></div>
       </div>
 
       <!-- ОБЗОР -->

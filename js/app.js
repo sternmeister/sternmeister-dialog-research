@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderScriptAudit();
   renderNewScript();
   renderBattleScript();
+  renderOnboarding();
   initCharts();
 });
 
@@ -1186,16 +1187,100 @@ function renderBSCheatsheet() {
   const c = BATTLE_SCRIPT.cheatsheet;
   return `<div class="bs-cheat-grid">
     <div class="card bs-cheat-card bs-cheat-must">
-      <div class="card-title" style="color:var(--success-light)">✅ ОБЯЗАТЕЛЬНО СКАЗАТЬ (12)</div>
+      <div class="card-title" style="color:var(--success-light)">✅ ОБЯЗАТЕЛЬНО СКАЗАТЬ (${c.must_say.length})</div>
       <ol class="bs-cheat-list">${c.must_say.map(i => `<li>${i}</li>`).join('')}</ol>
     </div>
     <div class="card bs-cheat-card bs-cheat-mustnot">
-      <div class="card-title" style="color:var(--danger-light)">❌ КАТЕГОРИЧЕСКИ НЕЛЬЗЯ (8)</div>
+      <div class="card-title" style="color:var(--danger-light)">❌ КАТЕГОРИЧЕСКИ НЕЛЬЗЯ (${c.must_not.length})</div>
       <ol class="bs-cheat-list">${c.must_not.map(i => `<li>${i}</li>`).join('')}</ol>
     </div>
     <div class="card bs-cheat-card bs-cheat-voss">
       <div class="card-title" style="color:var(--accent-light)">🛡 VOSS-протокол на возражения (5 шагов)</div>
       <ol class="bs-cheat-list bs-cheat-voss-list">${c.voss_protocol.map(i => `<li>${i}</li>`).join('')}</ol>
+    </div>
+  </div>`;
+}
+
+// ============== ONBOARDING (инструкция для менеджеров) ==============
+const ONB_STATE = { tab: 'steps' };
+
+function renderOnboarding() {
+  if (typeof BATTLE_SCRIPT === 'undefined' || !BATTLE_SCRIPT.onboarding) return;
+  const o = BATTLE_SCRIPT.onboarding;
+
+  const introEl = document.getElementById('onb-intro-text');
+  if (introEl) introEl.textContent = o.intro.text;
+
+  document.querySelectorAll('.onb-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.onb-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      ONB_STATE.tab = tab.dataset.otab;
+      renderOnbContent();
+    });
+  });
+
+  renderOnbContent();
+}
+
+function renderOnbContent() {
+  const root = document.getElementById('onb-content');
+  if (!root) return;
+  const t = ONB_STATE.tab;
+  if (t === 'steps') root.innerHTML = renderOnbSteps();
+  else if (t === 'glossary') root.innerHTML = renderOnbGlossary();
+  else if (t === 'faq') root.innerHTML = renderOnbFaq();
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderOnbSteps() {
+  const steps = BATTLE_SCRIPT.onboarding.steps;
+  return `<div class="onb-steps">${steps.map(s => `
+    <div class="card onb-step">
+      <div class="onb-step-head">
+        <div class="onb-step-num">${s.num}</div>
+        <div class="onb-step-title">
+          <span class="onb-step-icon">${s.icon}</span>
+          ${escapeHtml(s.title)}
+        </div>
+      </div>
+      <ol class="onb-step-items">
+        ${s.items.map(i => `<li>${escapeHtml(i).replace(/\n/g, '<br>')}</li>`).join('')}
+      </ol>
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderOnbGlossary() {
+  const g = BATTLE_SCRIPT.onboarding.glossary;
+  return `<div class="card">
+    <div class="card-title">📚 Глоссарий ключевых терминов (${g.length})</div>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Эти термины должны быть на кончике языка с первого дня — клиенты ими сыпят постоянно.</p>
+    <div class="onb-glossary">
+      ${g.map(t => `
+        <div class="onb-glossary-item">
+          <div class="onb-glossary-term">${escapeHtml(t.term)}</div>
+          <div class="onb-glossary-def">${escapeHtml(t.def)}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function renderOnbFaq() {
+  const faq = BATTLE_SCRIPT.onboarding.faq;
+  return `<div class="card">
+    <div class="card-title">❓ Частые вопросы новичков (${faq.length})</div>
+    <div class="onb-faq">
+      ${faq.map((f, i) => `
+        <div class="onb-faq-item">
+          <div class="onb-faq-q">Q${i + 1}. ${escapeHtml(f.q)}</div>
+          <div class="onb-faq-a">${escapeHtml(f.a).replace(/\n/g, '<br>')}</div>
+        </div>
+      `).join('')}
     </div>
   </div>`;
 }
